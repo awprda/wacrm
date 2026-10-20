@@ -8,9 +8,9 @@ import {
 
 describe("formatCurrency", () => {
   it("formats whole amounts with no minor units", () => {
-    // Use a non-breaking-space-tolerant check: Intl may insert NBSP.
+    // Grouping separator follows the runtime locale (en-US "," vs id-ID ".").
     const out = formatCurrency(1234, "USD");
-    expect(out).toContain("1,234");
+    expect(out).toMatch(/1[.,]234/);
     expect(out).not.toContain(".00");
   });
 
@@ -30,13 +30,13 @@ describe("formatCurrency", () => {
     // Intl is lenient here — it uses the code as the symbol.
     const out = formatCurrency(1234, "ZZZ");
     expect(out).toContain("ZZZ");
-    expect(out).toContain("1,234");
+    expect(out).toMatch(/1[.,]234/);
   });
 
   it("never throws on a structurally invalid code (no DB CHECK on deals.currency)", () => {
     for (const bad of ["United States", "US", "USDD", "12", "u$d"]) {
       expect(() => formatCurrency(1234, bad)).not.toThrow();
-      expect(formatCurrency(1234, bad)).toContain("1,234");
+      expect(formatCurrency(1234, bad)).toMatch(/1[.,]234/);
     }
   });
 
@@ -44,6 +44,12 @@ describe("formatCurrency", () => {
     for (const c of CURRENCIES) {
       expect(() => formatCurrency(1000, c.code)).not.toThrow();
     }
+  });
+
+  it("offers Indonesian Rupiah with a Rp symbol and formats it", () => {
+    expect(CURRENCIES.some((c) => c.code === "IDR" && c.symbol === "Rp")).toBe(true);
+    // Grouping separator depends on the runtime locale (en-US "," vs id-ID ".").
+    expect(formatCurrency(1234, "IDR")).toMatch(/1[.,]234/);
   });
 });
 
