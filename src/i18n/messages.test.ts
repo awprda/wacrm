@@ -11,7 +11,7 @@ import { createTranslator } from 'next-intl';
 
 const MESSAGES_DIR = join(process.cwd(), 'messages');
 const SOURCE_LOCALE = 'en';
-const TRANSLATED_LOCALES = ['ko', 'pt', 'es'];
+const TRANSLATED_LOCALES = ['id', 'ko', 'pt', 'es'];
 
 type Catalogue = Record<string, unknown>;
 
